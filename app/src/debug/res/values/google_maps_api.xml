@@ -1,5 +1,6 @@
 <resources>
+    <!-- Get the API key at https://console.developers.google.com/apis/dashboard -->
     <string name="google_maps_key"
         templateMergeStrategy="preserve"
-        translatable="false">AIzaSyDtYiYj7AoCE6-061ErT7g7P8zm1rxv_O0</string>
+        translatable="false">API_KEY</string>
 </resources>
