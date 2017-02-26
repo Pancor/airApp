@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Czystość powietrza</string>
+    <string name="title_activity_map">Map</string>
+    <string name="nearest_station">Najbliższa stacja</string>
+    <string name="map_station">Mapa stacji</string>
+    <string name="open">Otwarte</string>
+    <string name="close">Zamknięte</string>
+</resources>
