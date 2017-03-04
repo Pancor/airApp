@@ -1,8 +1,15 @@
 
 package pl.pancor.android.air.models.station;
 
+import android.util.Log;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class Time {
 
@@ -14,7 +21,9 @@ public class Time {
     private String tz;
     @SerializedName("v")
     @Expose
-    private Double v;
+    private long v;
+
+    private String convertedDate;
 
     public String getS() {
         return s;
@@ -32,12 +41,25 @@ public class Time {
         this.tz = tz;
     }
 
-    public Double getV() {
+    public long getV() {
         return v;
     }
 
-    public void setV(Double v) {
+    public void setV(long v) {
         this.v = v;
     }
 
+    public String getConvertedDate(){
+
+        if (convertedDate != null){
+
+            return convertedDate;
+        } else {
+
+            SimpleDateFormat sdf = new SimpleDateFormat("kk:mm dd-MM-yy");
+            convertedDate = sdf.format(v * 1000);
+
+            return convertedDate;
+        }
+    }
 }
