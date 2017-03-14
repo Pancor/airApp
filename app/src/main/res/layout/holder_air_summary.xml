@@ -30,7 +30,6 @@
                 android:layout_marginBottom="4dp"
                 android:textColor="@color/colorPrimary"
                 android:textSize="18sp"
-                android:text="umiarkowana"
                 android:layout_centerHorizontal="true"
                 android:layout_below="@+id/airQualityText"/>
 
@@ -48,7 +47,6 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorPrimary"
                 android:textSize="18sp"
-                android:text="73"
                 android:layout_centerHorizontal="true"
                 android:layout_below="@+id/airPointsText"/>
 

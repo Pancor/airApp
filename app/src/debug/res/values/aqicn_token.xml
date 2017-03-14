@@ -3,5 +3,5 @@
     <!-- Get the API key at http://aqicn.org/data-platform/token/#/ -->
     <string name="aqicn_token"
         templateMergeStrategy="preserve"
-        translatable="false">API</string>
+        translatable="false">API_TOKEN</string>
 </resources>

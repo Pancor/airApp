@@ -22,7 +22,9 @@ public class StationRecyclerAdapter extends RecyclerView.Adapter{
 
         mDelegatesManager = new AdapterDelegatesManager<>();
 
-        mDelegatesManager.addDelegate(new StationInfoDelegate(activity));
+        mDelegatesManager.addDelegate(new StationInfoDelegate(activity))
+                         .addDelegate(new StationSummaryDelegate(activity))
+                         .addDelegate(new AirPollutionDelegate(activity));
     }
 
     @Override
@@ -45,6 +47,6 @@ public class StationRecyclerAdapter extends RecyclerView.Adapter{
 
     @Override
     public int getItemCount() {
-        return 1;//TODO: change me!
+        return 3;//TODO: change me!
     }
 }

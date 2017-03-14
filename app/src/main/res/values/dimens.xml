@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Container Sheet -->
+    <dimen name="container_horizontal_padding">0dp</dimen>
+
+    <!-- NavigationDrawer -->
+    <dimen name="nav_drawer_width">304dp</dimen>
+    <dimen name="nav_header_height">160dp</dimen>
+
+    <!-- CollapsingToolbarLayout -->
+    <dimen name="coll_height">300dp</dimen>
+    <dimen name="overlap">78dp</dimen>
+
+</resources>

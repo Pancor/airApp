@@ -3,6 +3,7 @@ package pl.pancor.android.air.nearest_station;
 
 import pl.pancor.android.air.base.BaseView;
 import pl.pancor.android.air.models.station.Data;
+import pl.pancor.android.air.utils.location.Location;
 
 public interface NearestStation {
 
@@ -18,5 +19,9 @@ public interface NearestStation {
     interface Presenter{
 
         void findNearestStation(String token);
+
+        void onStart();
+
+        void onStop();
     }
 }

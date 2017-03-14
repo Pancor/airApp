@@ -2,9 +2,7 @@ package pl.pancor.android.air.nearest_station.recycler_adapter;
 
 
 import android.app.Activity;
-import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,10 +47,11 @@ public class StationInfoDelegate extends AdapterDelegate<Data> {
                                     @NonNull List<Object> payloads) {
 
         StationInfoHolder h = (StationInfoHolder) holder;
+        String distance = items.getCity().getDistanceToStation() + " km";
 
         h.mStationName.setText(items.getCity().getName());
         h.mLastCheck.setText(items.getTime().getConvertedDate());
-        h.mDistance.setText("cos");
+        h.mDistance.setText(distance);
     }
 
     static class StationInfoHolder extends RecyclerView.ViewHolder{

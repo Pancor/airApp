@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+<!-- Container Sheet -->
+<dimen name="container_horizontal_padding">72dp</dimen>
+
+<!-- SideNav -->
+<dimen name="side_nav_margin_top">140dp</dimen>
+
+</resources>

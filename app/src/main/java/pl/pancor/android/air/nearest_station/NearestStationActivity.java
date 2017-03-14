@@ -2,7 +2,7 @@ package pl.pancor.android.air.nearest_station;
 
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
-import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -16,6 +16,8 @@ import pl.pancor.android.air.R;
 import pl.pancor.android.air.base.App;
 import pl.pancor.android.air.base.BaseActivity;
 import pl.pancor.android.air.utils.ActivityUtils;
+import pl.pancor.android.air.utils.location.LocationModule;
+import pl.pancor.android.air.utils.location.LocationService;
 import retrofit2.Retrofit;
 
 public class NearestStationActivity extends BaseActivity {
@@ -29,6 +31,7 @@ public class NearestStationActivity extends BaseActivity {
 
     @Inject NearestStationPresenter mPresenter;
     @Inject Retrofit mRetrofit;
+    @Inject LocationService mLocationService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,10 +40,14 @@ public class NearestStationActivity extends BaseActivity {
         ButterKnife.bind(this);
         setupFragment();
 
-        Glide.with(this).load(R.drawable.house)
-                .crossFade()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(mCityView);
+        //Glide.with(this).load(R.drawable.house)
+        //        .crossFade()
+        //        .diskCacheStrategy(DiskCacheStrategy.ALL)
+        //        .into(mCityView);
+
+        mNavigationView.setCheckedItem(R.id.nearest_station);
+        if (mSideNavigationView != null)
+            mSideNavigationView.setCheckedItem(R.id.nearest_station);
     }
 
     private void setupFragment(){
@@ -56,7 +63,8 @@ public class NearestStationActivity extends BaseActivity {
         }
 
         DaggerNearestStationComponent.builder()
-                .nearestStationModule(new NearestStationModule(stationFragment, mRetrofit))
+                .nearestStationModule(new NearestStationModule(stationFragment))
+                .locationModule(new LocationModule(this))
                 .netComponent(((App)getApplication()).getNetComponent())
                 .build().inject(this);
     }

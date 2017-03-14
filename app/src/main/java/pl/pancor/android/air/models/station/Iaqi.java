@@ -4,6 +4,12 @@ package pl.pancor.android.air.models.station;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 public class Iaqi {
 
     @SerializedName("co")

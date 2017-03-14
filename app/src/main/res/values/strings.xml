@@ -11,4 +11,14 @@
     <string name="distance_to_station">Odległość do stacji</string>
     <string name="air_quality">Jakość powietrza</string>
     <string name="air_points">Ocena powietrza</string>
+
+    <string-array name="air_quality_array">
+        <item>dobra</item>
+        <item>średnia</item>
+        <item>niezdrowa dla osób wrazliwych</item>
+        <item>niezdrowa</item>
+        <item>bardzo niezdrowa</item>
+        <item>zagrożenie dla życia</item>
+    </string-array>
+
 </resources>

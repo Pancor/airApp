@@ -9,7 +9,7 @@ public class NearestStationModule {
 
     private NearestStation.View mView;
 
-    public NearestStationModule(NearestStation.View view, Retrofit retrofit){
+    public NearestStationModule(NearestStation.View view){
 
         mView = view;
     }

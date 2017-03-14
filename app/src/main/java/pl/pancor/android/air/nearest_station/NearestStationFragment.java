@@ -1,5 +1,6 @@
 package pl.pancor.android.air.nearest_station;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -7,20 +8,24 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.maps.model.LatLng;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import pl.pancor.android.air.R;
 import pl.pancor.android.air.models.station.Data;
 import pl.pancor.android.air.nearest_station.recycler_adapter.StationRecyclerAdapter;
+import pl.pancor.android.air.utils.location.LocationService;
 
-public class NearestStationFragment extends Fragment implements NearestStation.View {
+public class NearestStationFragment extends Fragment implements NearestStation.View{
 
     private static final String TAG = NearestStationFragment.class.getSimpleName();
 
@@ -40,6 +45,13 @@ public class NearestStationFragment extends Fragment implements NearestStation.V
         return new NearestStationFragment();
     }
 
+    @Override
+    public void onDetach(){
+        super.onDetach();
+
+        mPresenter.onStop();
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,10 +65,16 @@ public class NearestStationFragment extends Fragment implements NearestStation.V
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mPresenter.onStart();
         mPresenter.findNearestStation(getString(R.string.aqicn_token));
 
         mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new GridLayoutManager(getContext(), 1);
+
+        int columns = 1;
+        if (getResources().getBoolean(R.bool.is840dp))
+            columns = 2;
+
+        mLayoutManager = new GridLayoutManager(getContext(), columns);
         mRecyclerView.setLayoutManager(mLayoutManager);
     }
 

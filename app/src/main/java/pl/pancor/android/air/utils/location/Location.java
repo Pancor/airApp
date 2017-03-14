@@ -5,7 +5,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 public interface Location {
 
-    interface Service{
+    interface Service extends BaseLocation<Receiver>{
 
         void onStart();
 
@@ -14,8 +14,12 @@ public interface Location {
         void getLastKnownLocation();
     }
 
-    interface LocationReceiver{
+    interface Receiver{
 
-        void lastKnownLocation(LatLng latLng);
+        void lastKnownLocation(double latitude, double longitude);
+
+        void failedToConnectGoogleApiClient();
+
+        void userRefusedToSendLocation();
     }
 }

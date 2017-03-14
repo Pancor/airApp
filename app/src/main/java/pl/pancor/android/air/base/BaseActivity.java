@@ -1,11 +1,16 @@
 package pl.pancor.android.air.base;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.OnApplyWindowInsetsListener;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.view.WindowInsetsCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -13,18 +18,22 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.Unbinder;
 import pl.pancor.android.air.R;
+import pl.pancor.android.air.nearest_station.NearestStationActivity;
 
-public class BaseActivity extends AppCompatActivity {
+public class BaseActivity extends AppCompatActivity implements
+        NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = BaseActivity.class.getSimpleName();
 
@@ -35,7 +44,18 @@ public class BaseActivity extends AppCompatActivity {
     @Nullable @BindView(R.id.nav_view)
         protected NavigationView mNavigationView;
 
+    //layout-w600dp
+    @Nullable @BindView(R.id.side_nav_view)
+        protected NavigationView mSideNavigationView;
+
     protected ActionBarDrawerToggle mActionBarDrawerToggle = null;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+
+    }
 
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
@@ -45,6 +65,7 @@ public class BaseActivity extends AppCompatActivity {
         setToolbar();
         setDrawer();
         loadDrawerHeader();
+        setupSideNavigationView();
     }
 
     @Override
@@ -115,6 +136,8 @@ public class BaseActivity extends AppCompatActivity {
 
         if (mNavigationView != null){
 
+            mNavigationView.setNavigationItemSelectedListener(this);
+
             View drawerHeader = mNavigationView.getHeaderView(0);
 
             ImageView appIconView = (ImageView)
@@ -135,5 +158,28 @@ public class BaseActivity extends AppCompatActivity {
         } else {
             Log.w(TAG, "Couldn't load navigationView");
         }
+    }
+
+    private void setupSideNavigationView(){
+
+        if (mSideNavigationView != null){
+
+
+            mSideNavigationView.setNavigationItemSelectedListener(this);
+        }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+        Log.e(TAG, "click");
+        switch (item.getItemId()){
+
+            case R.id.nearest_station:
+                startActivity(new Intent(this, NearestStationActivity.class));
+                break;
+        }
+
+        return true;
     }
 }

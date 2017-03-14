@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" 
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="160dp">
+    android:layout_height="@dimen/nav_header_height">
 
     <ImageView
         android:id="@+id/appIconView"
         android:layout_width="75dp"
         android:layout_height="75dp"
-        android:layout_margin="8dp"/>
-    
+        android:layout_margin="8dp" />
+
     <TextView
         android:id="@+id/appNameView"
         android:layout_width="wrap_content"
@@ -32,5 +32,5 @@
         android:layout_marginTop="4dp"
         android:layout_marginBottom="8dp"
         android:layout_below="@+id/appNameView" />
-    
+
 </RelativeLayout>
