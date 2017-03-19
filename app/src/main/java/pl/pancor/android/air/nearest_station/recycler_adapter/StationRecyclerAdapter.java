@@ -7,7 +7,10 @@ import android.view.ViewGroup;
 
 import com.hannesdorfmann.adapterdelegates3.AdapterDelegatesManager;
 
+import java.util.ArrayList;
+
 import pl.pancor.android.air.models.station.Data;
+import pl.pancor.android.air.models.station.Polluter;
 
 
 public class StationRecyclerAdapter extends RecyclerView.Adapter{
@@ -47,6 +50,8 @@ public class StationRecyclerAdapter extends RecyclerView.Adapter{
 
     @Override
     public int getItemCount() {
-        return 3;//TODO: change me!
+
+        ArrayList<Polluter> polluters = mStation.getIaqi().getPolluters();
+        return polluters.size() > 0 ? 2 + polluters.size() : 0;
     }
 }

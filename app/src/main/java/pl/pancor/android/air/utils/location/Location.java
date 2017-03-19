@@ -1,7 +1,6 @@
 package pl.pancor.android.air.utils.location;
 
-
-import com.google.android.gms.maps.model.LatLng;
+import android.content.Intent;
 
 public interface Location {
 
@@ -12,6 +11,8 @@ public interface Location {
         void onStop();
 
         void getLastKnownLocation();
+
+        void onActivityResult(int requestCode, int resultCode);
     }
 
     interface Receiver{
@@ -21,5 +22,7 @@ public interface Location {
         void failedToConnectGoogleApiClient();
 
         void userRefusedToSendLocation();
+
+        void unableToObtainLocation();
     }
 }

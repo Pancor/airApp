@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import pl.pancor.android.air.R;
+
 public class Iaqi {
 
     @SerializedName("co")
@@ -48,6 +50,8 @@ public class Iaqi {
     @SerializedName("wd")
     @Expose
     private Wd wd;
+
+    private ArrayList<Polluter> polluters = new ArrayList<>();
 
     public Co getCo() {
         return co;
@@ -145,4 +149,42 @@ public class Iaqi {
         this.wd = wd;
     }
 
+
+    /**
+     * some ugly stuff, i don't know, how to better handle this POJO
+     * @return ArrayList of Polluters
+     */
+    public ArrayList<Polluter> getPolluters(){
+
+        if (polluters.size() <= 0) {
+            if (co != null)
+                polluters.add(new Polluter(R.string.CO, co.getV(), 10000));
+            if (no2 != null)
+                polluters.add(new Polluter(R.string.NO2, no2.getV(), 200));
+            if (o3 != null)
+                polluters.add(new Polluter(R.string.O3, o3.getV(), 120));
+            if (pm10 != null)
+                polluters.add(new Polluter(R.string.PM10, pm10.getV(), 50));
+            if (pm25 != null)
+                polluters.add(new Polluter(R.string.PM2_5, pm25.getV(), 25));
+            if (so2 != null)
+                polluters.add(new Polluter(R.string.SO2, so2.getV(), 350));
+
+/*  TODO: is it temperature, pressure and what...?
+            if (t != null)
+                polluters.add(new Polluter("T", t.getV(), 0));
+            if (p != null)
+                polluters.add(new Polluter("P", p.getV(), 0));
+            if (d != null)
+                polluters.add(new Polluter("D", d.getV()));
+            if (h != null)
+                polluters.add(new Polluter("H", h.getV()));
+            if (w != null)
+                polluters.add(new Polluter("W", w.getV()));
+            if (wd != null)
+                polluters.add(new Polluter("WD", wd.getV()));
+*/
+        }
+        return polluters;
+    }
 }

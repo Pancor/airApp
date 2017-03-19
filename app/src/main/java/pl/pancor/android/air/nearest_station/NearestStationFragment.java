@@ -66,16 +66,15 @@ public class NearestStationFragment extends Fragment implements NearestStation.V
         super.onViewCreated(view, savedInstanceState);
 
         mPresenter.onStart();
-        mPresenter.findNearestStation(getString(R.string.aqicn_token));
 
         mRecyclerView.setHasFixedSize(true);
 
-        int columns = 1;
-        if (getResources().getBoolean(R.bool.is840dp))
-            columns = 2;
+        int columns = getResources().getBoolean(R.bool.is840dp) ? 2 : 1;
 
         mLayoutManager = new GridLayoutManager(getContext(), columns);
         mRecyclerView.setLayoutManager(mLayoutManager);
+
+        mPresenter.findNearestStation(getString(R.string.aqicn_token));//TODO make it call only when bundle is null
     }
 
     @Override
@@ -94,7 +93,7 @@ public class NearestStationFragment extends Fragment implements NearestStation.V
     @Override
     public void setStation(Data station) {
 
-        mRecyclerView.setAdapter(new StationRecyclerAdapter(getActivity(), station));
+        setAdapter(station);
     }
 
     @Override
@@ -108,5 +107,10 @@ public class NearestStationFragment extends Fragment implements NearestStation.V
                         mPresenter.findNearestStation(getString(R.string.aqicn_token));
                     }
                 }).show();
+    }
+
+    private void setAdapter(Data station){
+
+        mRecyclerView.setAdapter(new StationRecyclerAdapter(getActivity(), station));
     }
 }

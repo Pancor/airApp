@@ -1,6 +1,7 @@
 package pl.pancor.android.air.nearest_station;
 
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -54,15 +55,39 @@ public class NearestStationPresenter implements NearestStation.Presenter, Locati
     }
 
     @Override
-    public void onStart() {
+    public void onActivityResult(int requestCode, int resultCode) {
+        mLocationService.onActivityResult(requestCode, resultCode);
+    }
 
+    @Override
+    public void onStart() {
         mLocationService.onStart();
     }
 
     @Override
     public void onStop() {
-
         mLocationService.onStop();
+    }
+
+    @Override
+    public void lastKnownLocation(double latitude, double longitude) {
+
+        getNearestStation(latitude, longitude);
+    }
+
+    @Override
+    public void failedToConnectGoogleApiClient() {
+
+    }
+
+    @Override
+    public void userRefusedToSendLocation() {
+
+    }
+
+    @Override
+    public void unableToObtainLocation() {
+
     }
 
     private void getNearestStation(final double lat, final double lng){
@@ -94,22 +119,5 @@ public class NearestStationPresenter implements NearestStation.Presenter, Locati
                 mView.onConnectionError();
             }
         });
-    }
-
-    @Override
-    public void lastKnownLocation(double latitude, double longitude) {
-
-        Log.e(TAG, "lastknowlocation");//TODO delete me
-        getNearestStation(latitude, longitude);
-    }
-
-    @Override
-    public void failedToConnectGoogleApiClient() {
-
-    }
-
-    @Override
-    public void userRefusedToSendLocation() {
-
     }
 }

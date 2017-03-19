@@ -1,40 +1,43 @@
 package pl.pancor.android.air.nearest_station.recycler_adapter;
 
-
 import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.HorizontalBarChart;
+import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.formatter.IValueFormatter;
+import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.hannesdorfmann.adapterdelegates3.AdapterDelegate;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import pl.pancor.android.air.R;
 import pl.pancor.android.air.models.station.Data;
+import pl.pancor.android.air.models.station.Polluter;
 
-public class AirPollutionDelegate extends AdapterDelegate<Data> {
+class AirPollutionDelegate extends AdapterDelegate<Data> {
 
     private LayoutInflater inflater;
     private Activity mActivity;
 
-    public AirPollutionDelegate(Activity activity){
+    AirPollutionDelegate(Activity activity){
 
         inflater = activity.getLayoutInflater();
         mActivity = activity;
@@ -53,64 +56,75 @@ public class AirPollutionDelegate extends AdapterDelegate<Data> {
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull Data items, int position,
+    protected void onBindViewHolder(@NonNull Data station, int position,
                                     @NonNull RecyclerView.ViewHolder holder,
                                     @NonNull List<Object> payloads) {
         AirPollutionHolder h = (AirPollutionHolder) holder;
+        Polluter polluter = station.getIaqi().getPolluters()
+                .get(position - 2);
 
-        h.mChart.getDescription().setEnabled(false);
-        h.mChart.getLegend().setEnabled(false);
-        h.mChart.highlightValue(null);
-        h.mChart.setDoubleTapToZoomEnabled(false);
+        setupHorizontalChart(h.mChart);
+        setData(h.mChart, polluter);
 
+        h.mAirElementView.setText(polluter.getPolluter());
 
-        XAxis xl = h.mChart.getXAxis();
-        xl.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xl.setDrawAxisLine(true);
-        xl.setDrawGridLines(false);
-        xl.setGranularity(10f);
+        String percentage =
+                Math.round(polluter.getValue()/polluter.getMaxValue() * 100) +
+                        mActivity.getResources()
+                                .getString(R.string.acceptable_standard);
+        h.mPercentaveView.setText(percentage);
 
-        YAxis yl = h.mChart.getAxisLeft();
-        yl.setDrawAxisLine(true);
-        yl.setDrawGridLines(true);
-        yl.setAxisMinimum(0f); // this replaces setStartAtZero(true)
-//        yl.setInverted(true);
-
-        YAxis yr = h.mChart.getAxisRight();
-        yr.setDrawAxisLine(true);
-        yr.setDrawGridLines(false);
-        yr.setAxisMinimum(0f); // this replaces setStartAtZero(true)
-//        yr.setInverted(true);
-
-        setData(h.mChart);
     }
 
     static class AirPollutionHolder extends RecyclerView.ViewHolder{
 
         @BindView(R.id.airElementView) TextView mAirElementView;
         @BindView(R.id.chart) HorizontalBarChart mChart;
+        @BindView(R.id.percentageView) TextView mPercentaveView;
 
-        public AirPollutionHolder(View v) {
+        AirPollutionHolder(View v) {
             super(v);
             ButterKnife.bind(this, v);
         }
     }
 
-    private void setData(HorizontalBarChart chart){
+    private void setupHorizontalChart(HorizontalBarChart chart){
+
+        chart.getDescription().setEnabled(false);
+        chart.getLegend().setEnabled(false);
+        chart.setTouchEnabled(false);
+
+        XAxis xl = chart.getXAxis();
+        xl.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xl.setDrawAxisLine(true);
+        xl.setDrawGridLines(false);
+        xl.setGranularity(10f);
+
+        YAxis yl = chart.getAxisLeft();
+        yl.setDrawLabels(false);
+        yl.setAxisMinimum(0f);
+
+        YAxis yr = chart.getAxisRight();
+        yr.setDrawAxisLine(true);
+        yr.setDrawGridLines(false);
+        yr.setAxisMinimum(0f);
+    }
+
+    private void setData(HorizontalBarChart chart, Polluter polluter){
+
+        LimitLine ll = new LimitLine(polluter.getMaxValue(), "");
+        ll.setLineWidth(4f);
+        chart.getAxisRight().addLimitLine(ll);
 
         ArrayList<BarEntry> yVals = new ArrayList<>();
-
-        yVals.add(new BarEntry(1f, 36));
+        yVals.add(new BarEntry(1f, Float.parseFloat(polluter.getValue()
+                .toString())));
 
         BarDataSet set1 = new BarDataSet(yVals, "");
         set1.setColor(ContextCompat.getColor(mActivity, R.color.colorPrimary));
+        set1.setHighlightEnabled(false);
 
-
-        ArrayList<IBarDataSet> dataSets = new ArrayList<>();
-        dataSets.add(set1);
-
-        BarData data = new BarData(dataSets);
-
+        BarData data = new BarData(set1);
         chart.setData(data);
     }
 }

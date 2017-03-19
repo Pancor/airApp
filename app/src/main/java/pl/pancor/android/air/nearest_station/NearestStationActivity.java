@@ -1,5 +1,6 @@
 package pl.pancor.android.air.nearest_station;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.view.View;
@@ -48,6 +49,12 @@ public class NearestStationActivity extends BaseActivity {
         mNavigationView.setCheckedItem(R.id.nearest_station);
         if (mSideNavigationView != null)
             mSideNavigationView.setCheckedItem(R.id.nearest_station);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mPresenter.onActivityResult(requestCode, resultCode);
     }
 
     private void setupFragment(){

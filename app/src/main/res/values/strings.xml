@@ -11,6 +11,7 @@
     <string name="distance_to_station">Odległość do stacji</string>
     <string name="air_quality">Jakość powietrza</string>
     <string name="air_points">Ocena powietrza</string>
+    <string name="acceptable_standard">% dopuszczalnej normy</string>
 
     <string-array name="air_quality_array">
         <item>dobra</item>
