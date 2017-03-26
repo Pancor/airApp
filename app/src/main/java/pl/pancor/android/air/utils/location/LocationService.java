@@ -34,8 +34,6 @@ public class LocationService implements Location.Service,
         ActivityCompat.OnRequestPermissionsResultCallback, LocationListener,
         ResultCallback<LocationSettingsResult>{
 
-    private static final String TAG = LocationService.class.getSimpleName();
-
     private static final int PERMISSIONS_REQUEST = 13;
     private static final int SETTINGS_CHECK = 23;
     private static final int GOOGLE_API_CLIENT_ERROR = 33;
@@ -57,7 +55,6 @@ public class LocationService implements Location.Service,
         @Override
         public void run() {
             mReceiver.unableToObtainLocation();
-            Log.e(TAG, "unableToObtainLocation()");
         }
     };
 
@@ -72,7 +69,6 @@ public class LocationService implements Location.Service,
     @Override
     public void getLastKnownLocation() {
 
-        Log.e(TAG, "getLastKnownLocation()");
         if (isPermissionsGranted(true))
             checkLocationSettings();
     }
@@ -80,14 +76,12 @@ public class LocationService implements Location.Service,
     @Override
     public void onActivityResult(int requestCode, int resultCode) {
 
-        Log.e(TAG, "onActivityResult()");
         resolveProblems(requestCode, resultCode);
     }
 
     @Override
     public void onLocationChanged(android.location.Location location) {
 
-        Log.e(TAG, "onLocationChanged");
         if (mLastLocation == null) {
 
             mLastLocation = location;
@@ -101,7 +95,6 @@ public class LocationService implements Location.Service,
     @Override
     public void onConnected(@Nullable Bundle bundle) {
 
-        Log.e(TAG, "onConnected");
         if (isWaitingForConnect)
             getLastKnownLocation();
     }
@@ -109,16 +102,14 @@ public class LocationService implements Location.Service,
     @Override
     public void onConnectionSuspended(int i) {
 
-        Log.e(TAG, "onConnectionSuspended");
+        //mGoogleApiClient will automatically try to reconnect
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult result) {
 
-        Log.e(TAG, "onConnectionFailed");
-        mReceiver.failedToConnectGoogleApiClient();
         if (!result.hasResolution()){
-            mReceiver.failedToConnectGoogleApiClient();
+            mReceiver.unableToObtainLocation();
             GoogleApiAvailability.getInstance()
                     .getErrorDialog(mActivity, result.getErrorCode(), 0).show();
             return;
@@ -169,7 +160,6 @@ public class LocationService implements Location.Service,
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
 
-        Log.e(TAG, "onRequestPermissionsResult");
         switch (requestCode){
             case PERMISSIONS_REQUEST:
 
@@ -187,7 +177,6 @@ public class LocationService implements Location.Service,
     @Override
     public void onResult(@NonNull LocationSettingsResult result) {
 
-        Log.e(TAG, "onResult()");
         final Status status = result.getStatus();
         switch (status.getStatusCode()){
             case LocationSettingsStatusCodes.SUCCESS:
@@ -213,14 +202,12 @@ public class LocationService implements Location.Service,
 
     private void checkLocationSettings() {
 
-        Log.e(TAG, "checkLocationSettings()");
         if (mGoogleApiClient != null){
 
             mLocationRequest = new LocationRequest()
                     .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                     .setFastestInterval(LOCATION_INTERVAL / 2)
                     .setInterval(LOCATION_INTERVAL)
-                    .setExpirationDuration(LOCATION_EXPIRATION_TIME)
                     .setNumUpdates(1);
 
             LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
@@ -234,7 +221,6 @@ public class LocationService implements Location.Service,
 
     private void getLocation(){
 
-        Log.e(TAG, "getLocation()");
         if (mGoogleApiClient != null)
             mLastLocation = LocationServices.FusedLocationApi
                     .getLastLocation(mGoogleApiClient);
@@ -246,7 +232,6 @@ public class LocationService implements Location.Service,
 
         if (mLastLocation != null) {
 
-            Log.e(TAG, "sendLatLngToReceiver");
             mReceiver.lastKnownLocation(mLastLocation.getLatitude(),
                     mLastLocation.getLongitude());
             mHandler.removeCallbacks(mExpiredLocationUpdate);
@@ -258,10 +243,8 @@ public class LocationService implements Location.Service,
 
     private void requestLocation(){
 
-        Log.e(TAG, "requestLocation()");
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
 
-            Log.e(TAG, "requestLocation() -> goes first if");
             LocationServices.FusedLocationApi.requestLocationUpdates(
                     mGoogleApiClient, mLocationRequest, this);
             mHandler.postDelayed(mExpiredLocationUpdate, LOCATION_EXPIRATION_TIME);
@@ -324,7 +307,7 @@ public class LocationService implements Location.Service,
                         mGoogleApiClient.connect();
                         break;
                     case Activity.RESULT_CANCELED:
-                        mReceiver.failedToConnectGoogleApiClient();
+                        mReceiver.unableToObtainLocation();
                         break;
                 }
         }

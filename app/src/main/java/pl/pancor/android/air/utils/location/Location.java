@@ -1,7 +1,5 @@
 package pl.pancor.android.air.utils.location;
 
-import android.content.Intent;
-
 public interface Location {
 
     interface Service extends BaseLocation<Receiver>{
@@ -10,16 +8,14 @@ public interface Location {
 
         void onStop();
 
-        void getLastKnownLocation();
-
         void onActivityResult(int requestCode, int resultCode);
+
+        void getLastKnownLocation();
     }
 
     interface Receiver{
 
         void lastKnownLocation(double latitude, double longitude);
-
-        void failedToConnectGoogleApiClient();
 
         void userRefusedToSendLocation();
 

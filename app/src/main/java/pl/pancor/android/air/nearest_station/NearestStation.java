@@ -12,11 +12,17 @@ public interface NearestStation {
         void setStation(Data station);
 
         void onConnectionError();
+
+        void userRefusedToGiveLocation();
+
+        void couldNotObtainLocalization();
     }
 
     interface Presenter{
 
         void findNearestStation(String token);
+
+        void getStation(Double latitude, Double longitude);
 
         void onActivityResult(int requestCode, int resultCode);
 

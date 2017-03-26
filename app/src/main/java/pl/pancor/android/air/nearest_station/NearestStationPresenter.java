@@ -1,14 +1,11 @@
 package pl.pancor.android.air.nearest_station;
 
 
-import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.util.Log;
-
-import com.google.android.gms.maps.model.LatLng;
 
 import javax.inject.Inject;
 
+import pl.pancor.android.air.R;
 import pl.pancor.android.air.base.FragmentScope;
 import pl.pancor.android.air.models.station.Station;
 import pl.pancor.android.air.net.NetService;
@@ -55,6 +52,13 @@ public class NearestStationPresenter implements NearestStation.Presenter, Locati
     }
 
     @Override
+    public void getStation(Double latitude, Double longitude) {
+
+        mView.setLoadingIndicator(true);
+        getNearestStation(latitude, longitude);
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode) {
         mLocationService.onActivityResult(requestCode, resultCode);
     }
@@ -76,13 +80,10 @@ public class NearestStationPresenter implements NearestStation.Presenter, Locati
     }
 
     @Override
-    public void failedToConnectGoogleApiClient() {
-
-    }
-
-    @Override
     public void userRefusedToSendLocation() {
 
+        mView.setLoadingIndicator(false);
+        mView.userRefusedToGiveLocation();
     }
 
     @Override

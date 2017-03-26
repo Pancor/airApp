@@ -34,7 +34,12 @@
             android:label="@string/app_name" />
 
         <activity
+            android:name=".find_location.FindLocationActivity"
+            android:label="@string/title_activity_map"
+            android:theme="@style/TransparentStatusBar"/>
+
+        <activity
             android:name=".MapActivity"
-            android:label="@string/title_activity_map" />
+            android:label="@string/title_activity_map"/>
     </application>
 </manifest>

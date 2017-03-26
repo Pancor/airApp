@@ -1,7 +1,12 @@
 package pl.pancor.android.air.nearest_station;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.RecoverySystem;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -21,6 +26,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import pl.pancor.android.air.R;
+import pl.pancor.android.air.find_location.FindLocationActivity;
 import pl.pancor.android.air.models.station.Data;
 import pl.pancor.android.air.nearest_station.recycler_adapter.StationRecyclerAdapter;
 import pl.pancor.android.air.utils.location.LocationService;
@@ -28,6 +34,7 @@ import pl.pancor.android.air.utils.location.LocationService;
 public class NearestStationFragment extends Fragment implements NearestStation.View{
 
     private static final String TAG = NearestStationFragment.class.getSimpleName();
+    private static final int REQUEST_LOCATION = 12;
 
     private GridLayoutManager mLayoutManager;
 
@@ -43,13 +50,6 @@ public class NearestStationFragment extends Fragment implements NearestStation.V
     public static NearestStationFragment newInstance(){
 
         return new NearestStationFragment();
-    }
-
-    @Override
-    public void onDetach(){
-        super.onDetach();
-
-        mPresenter.onStop();
     }
 
     @Nullable
@@ -78,6 +78,18 @@ public class NearestStationFragment extends Fragment implements NearestStation.V
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        handleOnActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onDetach(){
+        super.onDetach();
+        mPresenter.onStop();
+    }
+
+    @Override
     public void setPresenter(@NonNull NearestStation.Presenter presenter) {
 
         mPresenter = presenter;
@@ -93,13 +105,29 @@ public class NearestStationFragment extends Fragment implements NearestStation.V
     @Override
     public void setStation(Data station) {
 
-        setAdapter(station);
+        mRecyclerView.setAdapter(new StationRecyclerAdapter(getActivity(), station));
     }
 
     @Override
     public void onConnectionError() {
 
-        Snackbar.make(getView(), R.string.internet_error, Snackbar.LENGTH_INDEFINITE)
+        showErrorSnackBar(R.string.internet_error);
+    }
+
+    @Override
+    public void userRefusedToGiveLocation() {
+
+        showDialog(R.string.dialog_need_localization);
+    }
+
+    @Override
+    public void couldNotObtainLocalization() {
+
+        showDialog(R.string.dialog_could_not_get_localization);
+    }
+    private void showErrorSnackBar(int text){
+
+        Snackbar.make(getView(), text, Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.retry, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -109,8 +137,39 @@ public class NearestStationFragment extends Fragment implements NearestStation.V
                 }).show();
     }
 
-    private void setAdapter(Data station){
+    private void showDialog(int text){
 
-        mRecyclerView.setAdapter(new StationRecyclerAdapter(getActivity(), station));
+        new AlertDialog.Builder(getContext())
+                .setMessage(text)
+                .setCancelable(false)
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        startActivityForResult(new Intent(getActivity(),
+                                FindLocationActivity.class), REQUEST_LOCATION);
+                    }
+                })
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        dialogInterface.dismiss();
+                    }
+                }).show();
+    }
+
+    private void handleOnActivityResult(int requestCode, int resultCode, Intent data){
+
+        if (requestCode == REQUEST_LOCATION){
+            if (resultCode == Activity.RESULT_OK){
+
+                LatLng latLng = data.getParcelableExtra(FindLocationActivity.KEY_POSITION);
+                mPresenter.getStation(latLng.latitude, latLng.longitude);
+            } else {
+
+                //TODO: do something
+            }
+        }
     }
 }

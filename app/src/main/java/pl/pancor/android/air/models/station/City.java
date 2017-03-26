@@ -52,17 +52,20 @@ public class City {
         userGeo = new double[]{latitude, longitude};
     }
 
+    //TODO
     /**
      * @return distance between user location and station location in km
      */
     public double getDistanceToStation(){
 
-        float[] distance = new float[2];
+        if (geo != null) {
+            float[] distance = new float[2];
+            android.location.Location.distanceBetween(userGeo[0], userGeo[1],
+                    geo.get(0), geo.get(1), distance);
 
-        android.location.Location.distanceBetween(userGeo[0], userGeo[1],
-                geo.get(0), geo.get(1), distance);
-
-        return Math.round(distance[0] / 10) / 100;
+            return Math.round(distance[0] / 10) / 100;
+        }
+        return 0.0;
     }
 
 }

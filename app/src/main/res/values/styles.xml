@@ -9,6 +9,9 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <!-- it's only for API  -->
+    <style name="TransparentStatusBar" parent="Base.AppTheme" />
+
     <style name="Toolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="SplashTheme" parent="Base.AppTheme">

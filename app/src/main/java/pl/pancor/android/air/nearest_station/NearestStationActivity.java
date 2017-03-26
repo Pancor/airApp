@@ -16,6 +16,7 @@ import butterknife.ButterKnife;
 import pl.pancor.android.air.R;
 import pl.pancor.android.air.base.App;
 import pl.pancor.android.air.base.BaseActivity;
+import pl.pancor.android.air.find_location.FindLocationActivity;
 import pl.pancor.android.air.utils.ActivityUtils;
 import pl.pancor.android.air.utils.location.LocationModule;
 import pl.pancor.android.air.utils.location.LocationService;
