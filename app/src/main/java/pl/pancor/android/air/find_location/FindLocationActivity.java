@@ -2,15 +2,11 @@ package pl.pancor.android.air.find_location;
 
 import android.content.Intent;
 import android.content.IntentSender;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.View;
 
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
@@ -22,10 +18,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
-import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -44,6 +37,8 @@ public class FindLocationActivity extends AppCompatActivity implements
     private static final String TAG = FindLocationActivity.class.getSimpleName();
     private static final int PLACE_AUTOCOMPLETE_REQUEST = 18;
     private static final int PLACE_AUTOCOMPLETE_RESOLUTION = 28;
+    private static final int GOOGLE_API_REPAIR = 38;
+    private static final String STATE_LAT_LNG = "state_lat_lng";
 
     @BindView(R.id.coordinatorLayout) CoordinatorLayout mCoordinatorLayout;
     @BindView(R.id.mapSearchView)     MapSearchToolbar mMapSearchView;
@@ -51,6 +46,7 @@ public class FindLocationActivity extends AppCompatActivity implements
 
     private GoogleMap mMap;
 
+    //chosen by user
     private LatLng mLatLng;
 
     @Override
@@ -70,10 +66,30 @@ public class FindLocationActivity extends AppCompatActivity implements
     }
 
     @Override
+    protected void onPause(){
+        super.onPause();
+        if (mMap != null)
+            mMap.clear();
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         handleResult(requestCode, resultCode, data);
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+        state.putParcelable(STATE_LAT_LNG, mLatLng);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle state) {
+        super.onRestoreInstanceState(state);
+        mLatLng = state.getParcelable(STATE_LAT_LNG);
+    }
+
 
     @Override
     public void onMapReady(GoogleMap map) {
@@ -82,6 +98,8 @@ public class FindLocationActivity extends AppCompatActivity implements
         mMap.setOnMapClickListener(this);
         mMap.setOnMapLongClickListener(this);
 
+        if (mLatLng != null)
+            updateMarker();
     }
 
     @OnClick(R.id.fab) void sendPosition(){
@@ -111,6 +129,8 @@ public class FindLocationActivity extends AppCompatActivity implements
 
                 } catch (GooglePlayServicesRepairableException e) {
                     e.printStackTrace();
+                    GoogleApiAvailability.getInstance().getErrorDialog(FindLocationActivity.this,
+                            e.getConnectionStatusCode(), GOOGLE_API_REPAIR);
                 } catch (GooglePlayServicesNotAvailableException e) {
                     e.printStackTrace();
                 }
@@ -137,7 +157,7 @@ public class FindLocationActivity extends AppCompatActivity implements
         mLatLng = latLng;
         mFab.shouldFabBeVisible(true);
         mFab.animateFab(true);
-        mMap.clear();
+
         mMap.addMarker(new MarkerOptions()
                     .position(latLng));
 
@@ -146,6 +166,13 @@ public class FindLocationActivity extends AppCompatActivity implements
                 .zoom(15)
                 .build();
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
+
+    private void updateMarker(){
+
+        mMap.clear();
+        mMap.addMarker(new MarkerOptions()
+                .position(mLatLng));
     }
 
     private void handleResult(int requestCode, int resultCode, Intent data){
@@ -174,7 +201,7 @@ public class FindLocationActivity extends AppCompatActivity implements
                 switch (resultCode){
                     case RESULT_OK:
 
-
+                        //TODO handle me
                         break;
                 }
                 break;

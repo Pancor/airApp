@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -44,6 +45,8 @@ public class NearestStationFragment extends Fragment implements NearestStation.V
         protected RecyclerView mRecyclerView;
 
     private NearestStation.Presenter mPresenter;
+
+    private Data mStation;
 
     public NearestStationFragment(){}
 
@@ -103,9 +106,12 @@ public class NearestStationFragment extends Fragment implements NearestStation.V
     }
 
     @Override
-    public void setStation(Data station) {
+    public void setStation(Data station, Double lat, Double lng) {
 
-        mRecyclerView.setAdapter(new StationRecyclerAdapter(getActivity(), station));
+        Toast.makeText(getContext(), "Station: " + station.getCity().getGeo().get(0) + " " + station.getCity().getGeo().get(1) +
+                                     "User: " + lat + " " + lng, Toast.LENGTH_LONG).show();
+        mStation = station;
+        mRecyclerView.setAdapter(new StationRecyclerAdapter(getActivity(), mStation));
     }
 
     @Override
@@ -166,9 +172,9 @@ public class NearestStationFragment extends Fragment implements NearestStation.V
 
                 LatLng latLng = data.getParcelableExtra(FindLocationActivity.KEY_POSITION);
                 mPresenter.getStation(latLng.latitude, latLng.longitude);
-            } else {
+            } else if (resultCode == Activity.RESULT_CANCELED){
 
-                //TODO: do something
+                userRefusedToGiveLocation();
             }
         }
     }

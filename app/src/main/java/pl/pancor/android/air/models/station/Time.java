@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class Time {
 
@@ -22,8 +23,6 @@ public class Time {
     @SerializedName("v")
     @Expose
     private long v;
-
-    private String convertedDate;
 
     public String getS() {
         return s;
@@ -49,17 +48,5 @@ public class Time {
         this.v = v;
     }
 
-    public String getConvertedDate(){
 
-        if (convertedDate != null){
-
-            return convertedDate;
-        } else {
-
-            SimpleDateFormat sdf = new SimpleDateFormat("kk:mm dd-MM-yy");
-            convertedDate = sdf.format(v * 1000);
-
-            return convertedDate;
-        }
-    }
 }

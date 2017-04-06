@@ -3,14 +3,18 @@ package pl.pancor.android.air.nearest_station;
 
 import android.support.annotation.NonNull;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import pl.pancor.android.air.R;
 import pl.pancor.android.air.base.FragmentScope;
+import pl.pancor.android.air.models.station.City;
 import pl.pancor.android.air.models.station.Station;
 import pl.pancor.android.air.net.NetService;
 import pl.pancor.android.air.utils.location.Location;
 import pl.pancor.android.air.utils.location.LocationService;
+import pl.pancor.android.air.utils.location.LocationUtils;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -102,8 +106,12 @@ public class NearestStationPresenter implements NearestStation.Presenter, Locati
 
                 if (response.isSuccessful()){
 
-                    response.body().getData().getCity().setUserGeo(lat, lng);
-                    mView.setStation(response.body().getData());
+                    City city = response.body().getData().getCity();
+                    city.setDistance(LocationUtils.getDistance(lat, lng,
+                            city.getGeo().get(0), city.getGeo().get(1)));
+                    city.setGeo(checkCoordinates(city));
+
+                    mView.setStation(response.body().getData(), lat, lng);
                     mView.setLoadingIndicator(false);
                 } else {
 
@@ -120,5 +128,27 @@ public class NearestStationPresenter implements NearestStation.Presenter, Locati
                 mView.onConnectionError();
             }
         });
+    }
+
+    /**
+     * Coordinates are insert in List<Double>. From time to time latitude and longitude are mixed.
+     * This function check that, if first item is smaller than second, then they are inverted.
+     * This prevent to calculation of wrong distance in Poland. Check {@link LocationUtils} to see,
+     * how distance is calculated.
+     * @param city object, that hold coordinates of weather station
+     * @return List<Double> with coordinates
+     */
+    private List<Double> checkCoordinates(City city){
+
+        List<Double> geo = city.getGeo();
+
+        if (geo.get(0) < geo.get(1)){
+
+            Double lat = geo.get(1);
+            geo.set(1, geo.get(0));
+            geo.set(0, lat);
+            return geo;
+        }
+        return geo;
     }
 }

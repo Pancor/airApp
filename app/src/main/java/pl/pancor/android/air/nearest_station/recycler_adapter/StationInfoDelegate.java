@@ -17,6 +17,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import pl.pancor.android.air.R;
 import pl.pancor.android.air.models.station.Data;
+import pl.pancor.android.air.utils.OtherUtils;
 
 public class StationInfoDelegate extends AdapterDelegate<Data> {
 
@@ -47,10 +48,11 @@ public class StationInfoDelegate extends AdapterDelegate<Data> {
                                     @NonNull List<Object> payloads) {
 
         StationInfoHolder h = (StationInfoHolder) holder;
-        String distance = items.getCity().getDistanceToStation() + " km";
+        String distance = items.getCity().getDistance() + " km";
 
         h.mStationName.setText(items.getCity().getName());
-        h.mLastCheck.setText(items.getTime().getConvertedDate());
+        h.mLastCheck.setText(OtherUtils.getConvertedDate(items.getTime().getTz(),
+                items.getTime().getV()));
         h.mDistance.setText(distance);
     }
 

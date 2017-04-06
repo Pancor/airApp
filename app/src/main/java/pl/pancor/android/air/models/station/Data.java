@@ -1,6 +1,9 @@
 
 package pl.pancor.android.air.models.station;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -84,5 +87,4 @@ public class Data {
     public void setTime(Time time) {
         this.time = time;
     }
-
 }

@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -172,11 +173,13 @@ public class BaseActivity extends AppCompatActivity implements
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-        Log.e(TAG, "click");
         switch (item.getItemId()){
 
             case R.id.nearest_station:
                 startActivity(new Intent(this, NearestStationActivity.class));
+                break;
+            case R.id.map:
+                Toast.makeText(this, "Tam nie ma nic ciekawego", Toast.LENGTH_SHORT).show();
                 break;
         }
 
