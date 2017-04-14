@@ -18,18 +18,19 @@ import pl.pancor.android.air.base.App;
 import pl.pancor.android.air.base.BaseActivity;
 import pl.pancor.android.air.find_location.FindLocationActivity;
 import pl.pancor.android.air.utils.ActivityUtils;
+import pl.pancor.android.air.utils.HouseView;
 import pl.pancor.android.air.utils.location.LocationModule;
 import pl.pancor.android.air.utils.location.LocationService;
 import retrofit2.Retrofit;
 
-public class NearestStationActivity extends BaseActivity {
+public class NearestStationActivity extends BaseActivity implements NearestStationFragment.AirQuality {
 
     private static final String TAG = NearestStationActivity.class.getSimpleName();
 
-    @BindView(R.id.cityView)
-        protected ImageView mCityView;
     @BindView(R.id.coordinatorLayout)
         protected CoordinatorLayout mCoordinatorLayout;
+    @BindView(R.id.houseView)
+        protected HouseView houseView;
 
     @Inject NearestStationPresenter mPresenter;
     @Inject Retrofit mRetrofit;
@@ -41,11 +42,6 @@ public class NearestStationActivity extends BaseActivity {
         setContentView(R.layout.activity_nearest_station);
         ButterKnife.bind(this);
         setupFragment();
-
-        //Glide.with(this).load(R.drawable.house)
-        //        .crossFade()
-        //        .diskCacheStrategy(DiskCacheStrategy.ALL)
-        //        .into(mCityView);
 
         mNavigationView.setCheckedItem(R.id.nearest_station);
         if (mSideNavigationView != null)
@@ -75,5 +71,11 @@ public class NearestStationActivity extends BaseActivity {
                 .locationModule(new LocationModule(this))
                 .netComponent(((App)getApplication()).getNetComponent())
                 .build().inject(this);
+    }
+
+    @Override
+    public void onAirQualitySet(int airQuality) {
+
+        houseView.setAirQuality(airQuality);
     }
 }

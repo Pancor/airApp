@@ -1,6 +1,5 @@
 package pl.pancor.android.air.nearest_station.recycler_adapter;
 
-
 import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -16,10 +15,11 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import pl.pancor.android.air.R;
-import pl.pancor.android.air.models.station.Data;
+import pl.pancor.android.air.models.Station;
 import pl.pancor.android.air.utils.OtherUtils;
+import pl.pancor.android.air.utils.location.LocationUtils;
 
-public class StationInfoDelegate extends AdapterDelegate<Data> {
+public class StationInfoDelegate extends AdapterDelegate<Station> {
 
     private LayoutInflater inflater;
 
@@ -29,7 +29,7 @@ public class StationInfoDelegate extends AdapterDelegate<Data> {
     }
 
     @Override
-    protected boolean isForViewType(@NonNull Data items, int position) {
+    protected boolean isForViewType(@NonNull Station items, int position) {
 
         return position == 0;
     }
@@ -43,24 +43,25 @@ public class StationInfoDelegate extends AdapterDelegate<Data> {
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull Data items, int position,
+    protected void onBindViewHolder(@NonNull Station station, int position,
                                     @NonNull RecyclerView.ViewHolder holder,
                                     @NonNull List<Object> payloads) {
 
         StationInfoHolder h = (StationInfoHolder) holder;
-        String distance = items.getCity().getDistance() + " km";
 
-        h.mStationName.setText(items.getCity().getName());
-        h.mLastCheck.setText(OtherUtils.getConvertedDate(items.getTime().getTz(),
-                items.getTime().getV()));
+        //TODO
+        String distance = 1000 + " km";
+
+        h.mStationName.setText(station.getName());
+        h.mLastCheck.setText(OtherUtils.getConvertedDate(station.getUpdateTime()));
         h.mDistance.setText(distance);
     }
 
     static class StationInfoHolder extends RecyclerView.ViewHolder{
 
-        @BindView(R.id.nearestStationView) protected TextView mStationName;
-        @BindView(R.id.lastCheckView)      protected TextView mLastCheck;
-        @BindView(R.id.distanceView)       protected TextView mDistance;
+        @BindView(R.id.nearestStationView) TextView mStationName;
+        @BindView(R.id.lastCheckView)      TextView mLastCheck;
+        @BindView(R.id.distanceView)       TextView mDistance;
 
         private StationInfoHolder(View v) {
             super(v);

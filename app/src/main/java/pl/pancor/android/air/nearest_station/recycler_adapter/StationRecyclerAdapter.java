@@ -1,25 +1,25 @@
 package pl.pancor.android.air.nearest_station.recycler_adapter;
 
-
 import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.ViewGroup;
 
 import com.hannesdorfmann.adapterdelegates3.AdapterDelegatesManager;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import pl.pancor.android.air.models.station.Data;
-import pl.pancor.android.air.models.station.Polluter;
-
+import pl.pancor.android.air.models.Polluter;
+import pl.pancor.android.air.models.Station;
 
 public class StationRecyclerAdapter extends RecyclerView.Adapter{
 
-    private AdapterDelegatesManager<Data> mDelegatesManager;
+    private AdapterDelegatesManager<Station> mDelegatesManager;
 
-    private Data mStation;
+    private Station mStation;
 
-    public StationRecyclerAdapter(Activity activity, Data data){
+    public StationRecyclerAdapter(Activity activity, Station data){
 
         mStation = data;
 
@@ -51,7 +51,7 @@ public class StationRecyclerAdapter extends RecyclerView.Adapter{
     @Override
     public int getItemCount() {
 
-        ArrayList<Polluter> polluters = mStation.getIaqi().getPolluters();
+        List<Polluter> polluters = mStation.getPolluters();
         return polluters.size() > 0 ? 2 + polluters.size() : 0;
     }
 }

@@ -1,16 +1,15 @@
 package pl.pancor.android.air.nearest_station;
 
-
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
-import pl.pancor.android.air.R;
 import pl.pancor.android.air.base.FragmentScope;
-import pl.pancor.android.air.models.station.City;
-import pl.pancor.android.air.models.station.Station;
+import pl.pancor.android.air.models.DataResponse;
+import pl.pancor.android.air.models.Station;
 import pl.pancor.android.air.net.NetService;
 import pl.pancor.android.air.utils.location.Location;
 import pl.pancor.android.air.utils.location.LocationService;
@@ -97,21 +96,16 @@ public class NearestStationPresenter implements NearestStation.Presenter, Locati
 
     private void getNearestStation(final double lat, final double lng){
 
-        Call<Station> station = mRetrofit.create(NetService.class)
-                .createStation(lat, lng, mRequestToken);
+        Call<DataResponse<Station>> station = mRetrofit.create(NetService.class)
+                .getNearestStation(mRequestToken, lat, lng);
 
-        station.enqueue(new Callback<Station>() {
+        station.enqueue(new Callback<DataResponse<Station>>() {
             @Override
-            public void onResponse(Call<Station> call, Response<Station> response) {
+            public void onResponse(Call<DataResponse<Station>> call, Response<DataResponse<Station>> response) {
 
                 if (response.isSuccessful()){
 
-                    City city = response.body().getData().getCity();
-                    city.setDistance(LocationUtils.getDistance(lat, lng,
-                            city.getGeo().get(0), city.getGeo().get(1)));
-                    city.setGeo(checkCoordinates(city));
-
-                    mView.setStation(response.body().getData(), lat, lng);
+                    mView.setStation((Station) response.body().getData().get(0), lat, lng);
                     mView.setLoadingIndicator(false);
                 } else {
 
@@ -121,34 +115,12 @@ public class NearestStationPresenter implements NearestStation.Presenter, Locati
             }
 
             @Override
-            public void onFailure(Call<Station> call, Throwable t) {
+            public void onFailure(Call<DataResponse<Station>> call, Throwable t) {
 
                 t.printStackTrace();
                 mView.setLoadingIndicator(false);
                 mView.onConnectionError();
             }
         });
-    }
-
-    /**
-     * Coordinates are insert in List<Double>. From time to time latitude and longitude are mixed.
-     * This function check that, if first item is smaller than second, then they are inverted.
-     * This prevent to calculation of wrong distance in Poland. Check {@link LocationUtils} to see,
-     * how distance is calculated.
-     * @param city object, that hold coordinates of weather station
-     * @return List<Double> with coordinates
-     */
-    private List<Double> checkCoordinates(City city){
-
-        List<Double> geo = city.getGeo();
-
-        if (geo.get(0) < geo.get(1)){
-
-            Double lat = geo.get(1);
-            geo.set(1, geo.get(0));
-            geo.set(0, lat);
-            return geo;
-        }
-        return geo;
     }
 }

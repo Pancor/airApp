@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,22 +16,18 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.formatter.IValueFormatter;
-import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.hannesdorfmann.adapterdelegates3.AdapterDelegate;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import pl.pancor.android.air.R;
-import pl.pancor.android.air.models.station.Data;
-import pl.pancor.android.air.models.station.Polluter;
+import pl.pancor.android.air.models.Polluter;
+import pl.pancor.android.air.models.Station;
 
-class AirPollutionDelegate extends AdapterDelegate<Data> {
+class AirPollutionDelegate extends AdapterDelegate<Station> {
 
     private LayoutInflater inflater;
     private Activity mActivity;
@@ -44,7 +39,7 @@ class AirPollutionDelegate extends AdapterDelegate<Data> {
     }
 
     @Override
-    protected boolean isForViewType(@NonNull Data items, int position) {
+    protected boolean isForViewType(@NonNull Station items, int position) {
         return position >= 2;
     }
 
@@ -56,23 +51,24 @@ class AirPollutionDelegate extends AdapterDelegate<Data> {
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull Data station, int position,
+    protected void onBindViewHolder(@NonNull Station station, int position,
                                     @NonNull RecyclerView.ViewHolder holder,
                                     @NonNull List<Object> payloads) {
         AirPollutionHolder h = (AirPollutionHolder) holder;
-        Polluter polluter = station.getIaqi().getPolluters()
+        Polluter polluter = station.getPolluters()
                 .get(position - 2);
 
         setupHorizontalChart(h.mChart);
         setData(h.mChart, polluter);
 
-        h.mAirElementView.setText(polluter.getPolluter());
+        h.mAirElementView.setText(polluter.getName());
 
-        String percentage =
-                Math.round(polluter.getValue()/polluter.getMaxValue() * 100) +
-                        mActivity.getResources()
-                                .getString(R.string.acceptable_standard);
-        h.mPercentaveView.setText(percentage);
+        //TODO
+        //String percentage =
+        //        Math.round(polluter.getValue()/polluter.getMaxValue() * 100) +
+        //                mActivity.getResources()
+        //                        .getString(R.string.acceptable_standard);
+        //h.mPercentaveView.setText(percentage);
 
     }
 
@@ -112,9 +108,10 @@ class AirPollutionDelegate extends AdapterDelegate<Data> {
 
     private void setData(HorizontalBarChart chart, Polluter polluter){
 
-        LimitLine ll = new LimitLine(polluter.getMaxValue(), "");
-        ll.setLineWidth(4f);
-        chart.getAxisRight().addLimitLine(ll);
+        //TODO
+        //LimitLine ll = new LimitLine(polluter.getMaxValue(), "");
+        //ll.setLineWidth(4f);
+        //chart.getAxisRight().addLimitLine(ll);
 
         ArrayList<BarEntry> yVals = new ArrayList<>();
         yVals.add(new BarEntry(1f, Float.parseFloat(polluter.getValue()

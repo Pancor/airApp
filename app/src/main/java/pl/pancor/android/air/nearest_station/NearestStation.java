@@ -1,7 +1,8 @@
 package pl.pancor.android.air.nearest_station;
 
 import pl.pancor.android.air.base.BaseView;
-import pl.pancor.android.air.models.station.Data;
+import pl.pancor.android.air.models.Station;
+
 
 public interface NearestStation {
 
@@ -9,7 +10,7 @@ public interface NearestStation {
 
         void setLoadingIndicator(boolean active);
 
-        void setStation(Data station, Double lat, Double lng);
+        void setStation(Station station, Double lat, Double lng);
 
         void onConnectionError();
 

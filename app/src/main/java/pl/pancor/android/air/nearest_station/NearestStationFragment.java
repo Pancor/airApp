@@ -22,15 +22,12 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import pl.pancor.android.air.R;
 import pl.pancor.android.air.find_location.FindLocationActivity;
-import pl.pancor.android.air.models.station.Data;
+import pl.pancor.android.air.models.Station;
 import pl.pancor.android.air.nearest_station.recycler_adapter.StationRecyclerAdapter;
-import pl.pancor.android.air.utils.location.LocationService;
 
 public class NearestStationFragment extends Fragment implements NearestStation.View{
 
@@ -46,7 +43,7 @@ public class NearestStationFragment extends Fragment implements NearestStation.V
 
     private NearestStation.Presenter mPresenter;
 
-    private Data mStation;
+    private Station mStation;
 
     public NearestStationFragment(){}
 
@@ -77,7 +74,7 @@ public class NearestStationFragment extends Fragment implements NearestStation.V
         mLayoutManager = new GridLayoutManager(getContext(), columns);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mPresenter.findNearestStation(getString(R.string.aqicn_token));//TODO make it call only when bundle is null
+        mPresenter.findNearestStation(getString(R.string.air_token));//TODO make it call only when bundle is null
     }
 
     @Override
@@ -106,12 +103,14 @@ public class NearestStationFragment extends Fragment implements NearestStation.V
     }
 
     @Override
-    public void setStation(Data station, Double lat, Double lng) {
+    public void setStation(Station station, Double lat, Double lng) {
 
-        Toast.makeText(getContext(), "Station: " + station.getCity().getGeo().get(0) + " " + station.getCity().getGeo().get(1) +
+        Toast.makeText(getContext(), "Station: " + station.getLatitude() + " " + station.getLongitude() +
                                      "User: " + lat + " " + lng, Toast.LENGTH_LONG).show();
         mStation = station;
         mRecyclerView.setAdapter(new StationRecyclerAdapter(getActivity(), mStation));
+
+        ((NearestStationActivity)getActivity()).onAirQualitySet(station.getAqIndex());
     }
 
     @Override
@@ -138,7 +137,7 @@ public class NearestStationFragment extends Fragment implements NearestStation.V
                     @Override
                     public void onClick(View view) {
 
-                        mPresenter.findNearestStation(getString(R.string.aqicn_token));
+                        mPresenter.findNearestStation(getString(R.string.air_token));
                     }
                 }).show();
     }
@@ -177,5 +176,10 @@ public class NearestStationFragment extends Fragment implements NearestStation.V
                 userRefusedToGiveLocation();
             }
         }
+    }
+
+    public interface AirQuality{
+
+        void onAirQualitySet(int airQuality);
     }
 }

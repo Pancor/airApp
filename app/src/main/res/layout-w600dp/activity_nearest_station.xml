@@ -26,8 +26,8 @@
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 app:contentScrim="?colorPrimary">
 
-                <ImageView
-                    android:id="@+id/cityView"
+                <pl.pancor.android.air.utils.HouseView
+                    android:id="@+id/houseView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
 
