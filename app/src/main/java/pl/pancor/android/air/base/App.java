@@ -1,16 +1,15 @@
 package pl.pancor.android.air.base;
 
-
 import android.app.Application;
 
 import com.squareup.leakcanary.LeakCanary;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import io.realm.rx.RealmObservableFactory;
 import pl.pancor.android.air.net.DaggerNetComponent;
 import pl.pancor.android.air.net.NetComponent;
 import pl.pancor.android.air.net.NetModule;
-import pl.pancor.android.air.net.WebLinks;
 
 public class App extends Application {
 
@@ -25,12 +24,8 @@ public class App extends Application {
         if (!LeakCanary.isInAnalyzerProcess(this))
             LeakCanary.install(this);
 
-        //TODO setupRealm();
-
-        mNetComponent = DaggerNetComponent.builder()
-                .appModule(new AppModule(this))
-                .netModule(new NetModule(WebLinks.ROOT))
-                .build();
+        setupNetComponent();
+        setupRealm();
     }
 
     public NetComponent getNetComponent(){
@@ -38,13 +33,25 @@ public class App extends Application {
         return mNetComponent;
     }
 
+    private void setupNetComponent(){
+
+        mNetComponent = DaggerNetComponent.builder()
+                .appModule(new AppModule(this))
+                .netModule(new NetModule())
+                .build();
+    }
+
     private void setupRealm(){
 
+        Realm.init(this);
         RealmConfiguration conf = new RealmConfiguration.Builder()
                 .name(Realm.DEFAULT_REALM_NAME)
                 .schemaVersion(REALM_VERSION)
                 .deleteRealmIfMigrationNeeded()
+                .rxFactory(new RealmObservableFactory())
                 .build();
         Realm.setDefaultConfiguration(conf);
+
+        //Realm.deleteRealm(conf);
     }
 }

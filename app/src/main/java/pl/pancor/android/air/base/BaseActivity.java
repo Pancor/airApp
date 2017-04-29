@@ -8,9 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.OnApplyWindowInsetsListener;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.WindowInsetsCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -18,25 +15,26 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
-import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import pl.pancor.android.air.R;
+import pl.pancor.android.air.map.MapActivity;
 import pl.pancor.android.air.nearest_station.NearestStationActivity;
 
 public class BaseActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = BaseActivity.class.getSimpleName();
+
+    protected static int NAV_ITEM_INVALID = -1;
+    protected static final int NAV_ITEM_NEAREST_STATION = R.id.nearest_station;
+    protected static final int NAV_ITEM_MAP = R.id.map;
 
     @Nullable @BindView(R.id.drawer_layout)
         protected DrawerLayout mDrawerLayout;
@@ -52,13 +50,6 @@ public class BaseActivity extends AppCompatActivity implements
     protected ActionBarDrawerToggle mActionBarDrawerToggle = null;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-
-    }
-
-    @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         ButterKnife.bind(this);
@@ -70,12 +61,21 @@ public class BaseActivity extends AppCompatActivity implements
     }
 
     @Override
+    protected void onResume(){
+        super.onResume();
+        setupNavigationItem();
+    }
+
+    protected int getNavItem() {
+        return NAV_ITEM_INVALID;
+    }
+
+    @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
-        if (mActionBarDrawerToggle != null) {
+        if (mActionBarDrawerToggle != null)
             mActionBarDrawerToggle.onConfigurationChanged(newConfig);
-        }
     }
 
     @Override
@@ -87,11 +87,19 @@ public class BaseActivity extends AppCompatActivity implements
     @Override
     public void onBackPressed() {
 
-        if (mDrawerLayout != null && mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+        if (mDrawerLayout != null && mDrawerLayout.isDrawerOpen(GravityCompat.START))
             mDrawerLayout.closeDrawer(GravityCompat.START);
-        } else {
+        else
             super.onBackPressed();
-        }
+    }
+
+    private void setupNavigationItem(){
+
+        if (mNavigationView != null)
+            mNavigationView.setCheckedItem(getNavItem());
+
+        if (mSideNavigationView != null)
+            mSideNavigationView.setCheckedItem(getNavItem());
     }
 
     private void setToolbar(){
@@ -101,14 +109,13 @@ public class BaseActivity extends AppCompatActivity implements
             mToolbar.setTitle("");
             setSupportActionBar(mToolbar);
 
-        } else {
+        } else
             Log.w(TAG, "Couldn't set toolbar");
-        }
     }
 
     private void setDrawer(){
 
-        if (mToolbar != null && mDrawerLayout != null){
+        if (mDrawerLayout != null){
 
             mActionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                     mToolbar, R.string.open, R.string.close){
@@ -128,9 +135,8 @@ public class BaseActivity extends AppCompatActivity implements
             mDrawerLayout.addDrawerListener(mActionBarDrawerToggle);
             mActionBarDrawerToggle.syncState();
 
-        } else {
+        } else
             Log.w(TAG, "Couldn't set drawer");
-        }
     }
 
     private void loadDrawerHeader(){
@@ -156,18 +162,14 @@ public class BaseActivity extends AppCompatActivity implements
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }
-        } else {
+        } else
             Log.w(TAG, "Couldn't load navigationView");
-        }
     }
 
     private void setupSideNavigationView(){
 
-        if (mSideNavigationView != null){
-
-
+        if (mSideNavigationView != null)
             mSideNavigationView.setNavigationItemSelectedListener(this);
-        }
     }
 
     @Override
@@ -175,14 +177,40 @@ public class BaseActivity extends AppCompatActivity implements
 
         switch (item.getItemId()){
 
-            case R.id.nearest_station:
-                startActivity(new Intent(this, NearestStationActivity.class));
+            case NAV_ITEM_NEAREST_STATION:
+                if (getNavItem() != NAV_ITEM_NEAREST_STATION)
+                    openActivity(NearestStationActivity.class, true);
                 break;
-            case R.id.map:
-                Toast.makeText(this, "Tam nie ma nic ciekawego", Toast.LENGTH_SHORT).show();
+            case NAV_ITEM_MAP:
+                if (getNavItem() != NAV_ITEM_MAP)
+                    openActivity(MapActivity.class);
                 break;
         }
-
+        item.setChecked(true);
+        mDrawerLayout.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    /**
+     * Starts new activity.
+     * @param activity Activity to open
+     */
+    private void openActivity(Class activity){
+
+        openActivity(activity, false);
+    }
+
+    /**
+     * Starts new activity.
+     * @param activity Activity to open
+     * @param clearBackStack If it's true then clear back stack otherwise don't do it.
+     */
+    private void openActivity(Class activity, boolean clearBackStack){
+
+        Intent intent = new Intent(this, activity);
+        if (clearBackStack)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        startActivity(intent);
     }
 }

@@ -12,16 +12,14 @@ import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import pl.pancor.android.air.base.App;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module
 public class NetModule {
 
-    private String mUrl;
+    public NetModule(){
 
-    public NetModule(String url){
-
-        mUrl = url;
     }
 
     @Provides
@@ -52,7 +50,8 @@ public class NetModule {
 
         return new Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create(gson))
-                .baseUrl(mUrl)
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .baseUrl(WebLinks.ROOT)
                 .client(okHttpClient)
                 .build();
     }

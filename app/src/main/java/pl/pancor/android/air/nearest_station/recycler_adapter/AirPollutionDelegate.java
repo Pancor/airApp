@@ -4,6 +4,11 @@ import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.SuperscriptSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +31,7 @@ import butterknife.ButterKnife;
 import pl.pancor.android.air.R;
 import pl.pancor.android.air.models.Polluter;
 import pl.pancor.android.air.models.Station;
+import pl.pancor.android.air.utils.OtherUtils;
 
 class AirPollutionDelegate extends AdapterDelegate<Station> {
 
@@ -55,28 +61,24 @@ class AirPollutionDelegate extends AdapterDelegate<Station> {
                                     @NonNull RecyclerView.ViewHolder holder,
                                     @NonNull List<Object> payloads) {
         AirPollutionHolder h = (AirPollutionHolder) holder;
-        Polluter polluter = station.getPolluters()
-                .get(position - 2);
+        Polluter polluter = station.getPolluters().get(position - 2);
 
         setupHorizontalChart(h.mChart);
         setData(h.mChart, polluter);
 
-        h.mAirElementView.setText(polluter.getName());
+        h.mAirElementView.setText(OtherUtils.getSpannedWithSubscriptNumbers(polluter.getName()));
 
-        //TODO
-        //String percentage =
-        //        Math.round(polluter.getValue()/polluter.getMaxValue() * 100) +
-        //                mActivity.getResources()
-        //                        .getString(R.string.acceptable_standard);
-        //h.mPercentaveView.setText(percentage);
-
+        String percentage =
+                Math.round(polluter.getValue() / polluter.getAlertValue() * 100) +
+                mActivity.getResources().getString(R.string.acceptable_standard);
+        h.mPercentageView.setText(percentage);
     }
 
     static class AirPollutionHolder extends RecyclerView.ViewHolder{
 
         @BindView(R.id.airElementView) TextView mAirElementView;
         @BindView(R.id.chart) HorizontalBarChart mChart;
-        @BindView(R.id.percentageView) TextView mPercentaveView;
+        @BindView(R.id.percentageView) TextView mPercentageView;
 
         AirPollutionHolder(View v) {
             super(v);
@@ -108,10 +110,9 @@ class AirPollutionDelegate extends AdapterDelegate<Station> {
 
     private void setData(HorizontalBarChart chart, Polluter polluter){
 
-        //TODO
-        //LimitLine ll = new LimitLine(polluter.getMaxValue(), "");
-        //ll.setLineWidth(4f);
-        //chart.getAxisRight().addLimitLine(ll);
+        LimitLine ll = new LimitLine(polluter.getAlertValue().floatValue(), "");
+        ll.setLineWidth(4f);
+        chart.getAxisRight().addLimitLine(ll);
 
         ArrayList<BarEntry> yVals = new ArrayList<>();
         yVals.add(new BarEntry(1f, Float.parseFloat(polluter.getValue()

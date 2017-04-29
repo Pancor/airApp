@@ -1,26 +1,32 @@
 package pl.pancor.android.air.nearest_station;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
-
-import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
 import pl.pancor.android.air.base.FragmentScope;
+import pl.pancor.android.air.data.RealmService;
 import pl.pancor.android.air.models.DataResponse;
 import pl.pancor.android.air.models.Station;
+import pl.pancor.android.air.models.User;
 import pl.pancor.android.air.net.NetService;
+import pl.pancor.android.air.utils.OtherUtils;
 import pl.pancor.android.air.utils.location.Location;
 import pl.pancor.android.air.utils.location.LocationService;
+
+
 import pl.pancor.android.air.utils.location.LocationUtils;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 
 @FragmentScope
-public class NearestStationPresenter implements NearestStation.Presenter, Location.Receiver {
+public class NearestStationPresenter implements NearestStation.Presenter,
+        Location.Receiver {
 
     private static final String TAG = NearestStationPresenter.class.getSimpleName();
     private static String mRequestToken;
@@ -31,12 +37,18 @@ public class NearestStationPresenter implements NearestStation.Presenter, Locati
 
     private LocationService mLocationService;
 
+    private RealmService realmService;
+
+    private Disposable disposable;
+
     @Inject
-    NearestStationPresenter(NearestStation.View view, Retrofit retrofit, LocationService service){
+    NearestStationPresenter(NearestStation.View view, Retrofit retrofit,
+                            LocationService service, RealmService realmService){
 
         mView = view;
         mRetrofit = retrofit;
         mLocationService = service;
+        this.realmService = realmService;
     }
 
     @Inject
@@ -74,6 +86,10 @@ public class NearestStationPresenter implements NearestStation.Presenter, Locati
     @Override
     public void onStop() {
         mLocationService.onStop();
+        realmService.close();
+
+        if (disposable != null && !disposable.isDisposed())
+            disposable.dispose();
     }
 
     @Override
@@ -94,33 +110,50 @@ public class NearestStationPresenter implements NearestStation.Presenter, Locati
 
     }
 
-    private void getNearestStation(final double lat, final double lng){
+    private void getNearestStation(Double lat, Double lng){
 
-        Call<DataResponse<Station>> station = mRetrofit.create(NetService.class)
-                .getNearestStation(mRequestToken, lat, lng);
+        User user = realmService.getUser();
+        if (user != null) {
 
-        station.enqueue(new Callback<DataResponse<Station>>() {
-            @Override
-            public void onResponse(Call<DataResponse<Station>> call, Response<DataResponse<Station>> response) {
+            Station station = realmService.getStation();
 
-                if (response.isSuccessful()){
+            if (LocationUtils.getDistance(lat, lng,
+                    user.getLatitude(), user.getLongitude()) < 0.3 &&
+                station != null &&
+                OtherUtils.isTimeUpToDate(station.getUpdateTime())){
 
-                    mView.setStation((Station) response.body().getData().get(0), lat, lng);
-                    mView.setLoadingIndicator(false);
-                } else {
-
-                    mView.setLoadingIndicator(false);
-                    mView.onConnectionError();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<DataResponse<Station>> call, Throwable t) {
-
-                t.printStackTrace();
+                mView.setStation(station);
                 mView.setLoadingIndicator(false);
-                mView.onConnectionError();
+            } else {
+                getDataFromServer(lat, lng);
             }
-        });
+        } else {
+            realmService.addUser(lat, lng);
+            getDataFromServer(lat, lng);
+        }
+    }
+
+    private void getDataFromServer(Double lat, Double lng){
+
+        disposable = mRetrofit.create(NetService.class)
+                .getNearestStation(mRequestToken, lat, lng)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(dataResponse -> handleData(dataResponse, lat, lng),
+                        throwable ->  {throwable.printStackTrace();mView.onConnectionError();},
+                        () -> mView.setLoadingIndicator(false));
+    }
+    private void handleData(DataResponse<Station> dataResponse, Double lat, Double lng){
+
+        if (!dataResponse.isError()) {
+
+            Station station = dataResponse.getData().get(0);
+            station.setDistance(LocationUtils.getDistance(lat, lng,
+                    station.getLatitude(), station.getLongitude()));
+
+            realmService.addStation(station);
+            mView.setStation(station);
+        } else
+            mView.onConnectionError();
     }
 }

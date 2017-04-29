@@ -40,14 +40,14 @@ public class FindLocationActivity extends AppCompatActivity implements
     private static final int GOOGLE_API_REPAIR = 38;
     private static final String STATE_LAT_LNG = "state_lat_lng";
 
-    @BindView(R.id.coordinatorLayout) CoordinatorLayout mCoordinatorLayout;
-    @BindView(R.id.mapSearchView)     MapSearchToolbar mMapSearchView;
-    @BindView(R.id.fab)               FindLocationFAB mFab;
+    @BindView(R.id.coordinatorLayout) CoordinatorLayout coordinatorLayout;
+    @BindView(R.id.mapSearchView)     MapSearchToolbar mapSearchView;
+    @BindView(R.id.fab)               FindLocationFAB fab;
 
-    private GoogleMap mMap;
+    private GoogleMap map;
 
     //chosen by user
-    private LatLng mLatLng;
+    private LatLng latLng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,14 +62,14 @@ public class FindLocationActivity extends AppCompatActivity implements
         setupMapSearch();
 
         if (savedInstanceState == null)
-            mFab.animateFab(false);
+            fab.animateFab(false);
     }
 
     @Override
     protected void onPause(){
         super.onPause();
-        if (mMap != null)
-            mMap.clear();
+        if (map != null)
+            map.clear();
     }
 
     @Override
@@ -81,69 +81,75 @@ public class FindLocationActivity extends AppCompatActivity implements
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
-        state.putParcelable(STATE_LAT_LNG, mLatLng);
+        state.putParcelable(STATE_LAT_LNG, latLng);
     }
 
     @Override
     public void onRestoreInstanceState(Bundle state) {
         super.onRestoreInstanceState(state);
-        mLatLng = state.getParcelable(STATE_LAT_LNG);
+        latLng = state.getParcelable(STATE_LAT_LNG);
     }
 
 
     @Override
     public void onMapReady(GoogleMap map) {
 
-        mMap = map;
-        mMap.setOnMapClickListener(this);
-        mMap.setOnMapLongClickListener(this);
+        this.map = map;
+        this.map.setOnMapClickListener(this);
+        this.map.setOnMapLongClickListener(this);
 
-        if (mLatLng != null)
+        if (latLng != null)
             updateMarker();
     }
 
     @OnClick(R.id.fab) void sendPosition(){
 
         Intent intent = new Intent(this, NearestStationActivity.class);
-        intent.putExtra(KEY_POSITION, mLatLng);
+        intent.putExtra(KEY_POSITION, latLng);
         setResult(RESULT_OK, intent);
         finish();
     }
 
+    @Override
+    public void onBackPressed(){
+        super.onBackPressed();
+
+        setResult(RESULT_CANCELED);
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
     private void setupMapSearch(){
 
-        mMapSearchView.setOnBackButtonClickListener(new MapSearchToolbar.OnMapSearchClickListener() {
-            @Override
-            public void onBackButtonClick() {
+        setSupportActionBar(mapSearchView.getToolbar());
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-                setResult(RESULT_CANCELED);
-                finish();
-            }
+        mapSearchView.setOnMapSearchClickListener(() -> {
+            try {
+                Intent i = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
+                        .build(FindLocationActivity.this);
+                startActivityForResult(i, PLACE_AUTOCOMPLETE_REQUEST);
 
-            @Override
-            public void onSearchViewClicked() {
-                try {
-                    Intent i = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
-                            .build(FindLocationActivity.this);
-                    startActivityForResult(i, PLACE_AUTOCOMPLETE_REQUEST);
-
-                } catch (GooglePlayServicesRepairableException e) {
-                    e.printStackTrace();
-                    GoogleApiAvailability.getInstance().getErrorDialog(FindLocationActivity.this,
-                            e.getConnectionStatusCode(), GOOGLE_API_REPAIR);
-                } catch (GooglePlayServicesNotAvailableException e) {
-                    e.printStackTrace();
-                }
+            } catch (GooglePlayServicesRepairableException e) {
+                e.printStackTrace();
+                GoogleApiAvailability.getInstance().getErrorDialog(FindLocationActivity.this,
+                        e.getConnectionStatusCode(), GOOGLE_API_REPAIR);
+            } catch (GooglePlayServicesNotAvailableException e) {
+                e.printStackTrace();
             }
         });
-        mMapSearchView.setupBackButton();
     }
 
     @Override
     public void onMapClick(LatLng latLng) {
 
-        mMapSearchView.animateView();
-        mFab.animateFab();
+        mapSearchView.animateView();
+        fab.animateFab();
     }
 
     @Override
@@ -154,25 +160,30 @@ public class FindLocationActivity extends AppCompatActivity implements
 
     private void setMarker(LatLng latLng){
 
-        mLatLng = latLng;
-        mFab.shouldFabBeVisible(true);
-        mFab.animateFab(true);
+        this.latLng = latLng;
+        fab.shouldFabBeVisible(true);
+        fab.animateFab(true);
 
-        mMap.addMarker(new MarkerOptions()
+        map.addMarker(new MarkerOptions()
                     .position(latLng));
 
+        animateMapCamera(latLng, 15);
+    }
+
+    private void animateMapCamera(LatLng position, int zoom){
+
         CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(latLng)
-                .zoom(15)
+                .target(position)
+                .zoom(zoom)
                 .build();
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
     private void updateMarker(){
 
-        mMap.clear();
-        mMap.addMarker(new MarkerOptions()
-                .position(mLatLng));
+        map.clear();
+        map.addMarker(new MarkerOptions()
+                .position(latLng));
     }
 
     private void handleResult(int requestCode, int resultCode, Intent data){

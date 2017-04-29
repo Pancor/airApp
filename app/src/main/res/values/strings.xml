@@ -16,6 +16,7 @@
     <string name="no">Nie</string>
     <string name="dialog_need_localization">Bez znajomości Twojej lokalizacji, nie jesteśmy w stanie pokazać informacji na temat jakości powietrza w Twojej okolicy. Czy chcesz w zamian ręcznie podać nam swoją pozycję?</string>
     <string name="dialog_could_not_get_localization">Wystąpił problem, podczas pobierania Twojej lokalizacji. Czy chcesz w zamian ręcznie podać nam swoją pozycję?</string>
+    <string name="dialog_unknown_error">Wystąpił nieoczekiwany błąd. Chcesz ponowić próbę?</string>
     <string name="write_address">Wpisz adres</string>
 
     <string-array name="air_quality_array">

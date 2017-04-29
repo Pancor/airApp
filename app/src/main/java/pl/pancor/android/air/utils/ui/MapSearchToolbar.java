@@ -1,16 +1,14 @@
 package pl.pancor.android.air.utils.ui;
 
-
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v4.widget.DrawerLayout;
+import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import butterknife.BindView;
@@ -20,15 +18,13 @@ import pl.pancor.android.air.R;
 public class MapSearchToolbar extends FrameLayout{
 
     private static final String SUPER_STATE = "state_super";
-    private static final String DRAWER_STATE = "state_is_drawer_open";
     private static final String IS_SHOWED_STATE = "sate_is_showed";
 
-    private OnMapSearchClickListener mOnMapSearchClickListener;
+    private OnMapSearchClickListener onMapSearchClickListener;
 
-    @BindView(R.id.actionView)     protected ImageView mActionView;
-    @BindView(R.id.searchTextView) protected TextView mSearchTextView;
+    @BindView(R.id.searchTextView) protected TextView searchTextView;
+    @BindView(R.id.toolbar)        protected Toolbar toolbar;
 
-    private boolean isDrawerOpen = false;
     private boolean isShowed = true;
 
     public MapSearchToolbar(Context context) {
@@ -55,13 +51,12 @@ public class MapSearchToolbar extends FrameLayout{
 
     private void setupSearchPlace(){
 
-        mSearchTextView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        searchTextView.setOnClickListener(view -> onMapSearchClickListener.onSearchViewClicked());
+    }
 
-                mOnMapSearchClickListener.onSearchViewClicked();
-            }
-        });
+    public Toolbar getToolbar(){
+
+        return toolbar;
     }
 
     public void animateView(){
@@ -85,50 +80,12 @@ public class MapSearchToolbar extends FrameLayout{
             animate().translationY(0).alpha(1.0f);
     }
 
-    public void setupBackButton(){
-
-        mActionView.setImageResource(R.drawable.ic_arrow_back_black_24dp);
-    }
-
-    public void setOnBackButtonClickListener(OnMapSearchClickListener listener){
-
-        mOnMapSearchClickListener = listener;
-        mActionView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mOnMapSearchClickListener.onBackButtonClick();
-            }
-        });
-    }
-
-    public void setMenuDrawer(final DrawerLayout drawerLayout){
-
-        mActionView.setImageResource(R.drawable.ic_menu_black_24dp);
-
-        mActionView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if(isDrawerOpen){
-
-                    isDrawerOpen = false;
-                    drawerLayout.closeDrawer(Gravity.LEFT);
-                } else {
-
-                    isDrawerOpen = true;
-                    drawerLayout.openDrawer(Gravity.LEFT);
-                }
-            }
-        });
-    }
-
     @Override
     protected Parcelable onSaveInstanceState() {
 
         Bundle bundle = new Bundle();
         bundle.putParcelable(SUPER_STATE, super.onSaveInstanceState());
         bundle.putBoolean(IS_SHOWED_STATE, isShowed);
-        bundle.putBoolean(DRAWER_STATE, isDrawerOpen);
         return bundle;
     }
 
@@ -139,16 +96,18 @@ public class MapSearchToolbar extends FrameLayout{
 
             Bundle bundle = (Bundle) parcelable;
             isShowed = bundle.getBoolean(IS_SHOWED_STATE);
-            isDrawerOpen = bundle.getBoolean(DRAWER_STATE);
             updateView();
             parcelable = bundle.getParcelable(SUPER_STATE);
         }
         super.onRestoreInstanceState(parcelable);
     }
 
-    public interface OnMapSearchClickListener {
+    public void setOnMapSearchClickListener(OnMapSearchClickListener listener){
 
-        void onBackButtonClick();
+        onMapSearchClickListener = listener;
+    }
+
+    public interface OnMapSearchClickListener {
 
         void onSearchViewClicked();
     }

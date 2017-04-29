@@ -2,6 +2,8 @@ package pl.pancor.android.air.nearest_station;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.view.View;
 import android.widget.ImageView;
@@ -16,6 +18,7 @@ import butterknife.ButterKnife;
 import pl.pancor.android.air.R;
 import pl.pancor.android.air.base.App;
 import pl.pancor.android.air.base.BaseActivity;
+import pl.pancor.android.air.data.RealmModule;
 import pl.pancor.android.air.find_location.FindLocationActivity;
 import pl.pancor.android.air.utils.ActivityUtils;
 import pl.pancor.android.air.utils.HouseView;
@@ -23,22 +26,17 @@ import pl.pancor.android.air.utils.location.LocationModule;
 import pl.pancor.android.air.utils.location.LocationService;
 import retrofit2.Retrofit;
 
-public class NearestStationActivity extends BaseActivity implements NearestStationFragment.AirQuality {
+public class NearestStationActivity extends BaseActivity{
 
     private static final String TAG = NearestStationActivity.class.getSimpleName();
-
-    @BindView(R.id.coordinatorLayout)
-        protected CoordinatorLayout mCoordinatorLayout;
-    @BindView(R.id.houseView)
-        protected HouseView houseView;
 
     @Inject NearestStationPresenter mPresenter;
     @Inject Retrofit mRetrofit;
     @Inject LocationService mLocationService;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onCreate(@Nullable Bundle state) {
+        super.onCreate(state);
         setContentView(R.layout.activity_nearest_station);
         ButterKnife.bind(this);
         setupFragment();
@@ -69,13 +67,13 @@ public class NearestStationActivity extends BaseActivity implements NearestStati
         DaggerNearestStationComponent.builder()
                 .nearestStationModule(new NearestStationModule(stationFragment))
                 .locationModule(new LocationModule(this))
+                .realmModule(new RealmModule())
                 .netComponent(((App)getApplication()).getNetComponent())
                 .build().inject(this);
     }
 
     @Override
-    public void onAirQualitySet(int airQuality) {
-
-        houseView.setAirQuality(airQuality);
+    protected int getNavItem(){
+        return NAV_ITEM_NEAREST_STATION;
     }
 }

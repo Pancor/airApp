@@ -78,7 +78,7 @@ public class HouseView extends View {
     }
 
     private void drawView(Canvas canvas){
-
+/*TODO
         float deltaTime = timeStep();
 
         for (Renderable renderable : renderables){
@@ -87,18 +87,18 @@ public class HouseView extends View {
             if (renderable instanceof Smoke || renderable instanceof Smog)
                 renderable.update(deltaTime, 0);
         }
-        invalidate();
+        invalidate();*/
     }
 
     private void init(){
-
+/*TODO
         renderables = new Renderable[3];
 
         addSmoke(getMeasuredWidth() * 0.7f, getMeasuredHeight() * 0.405f);
         addChimney(getMeasuredWidth() * 0.7f, getMeasuredHeight() * 0.4f);
         addSmog();
 
-        setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        setLayerType(View.LAYER_TYPE_HARDWARE, null);*/
     }
 
     private void addSmog(){
@@ -153,12 +153,12 @@ public class HouseView extends View {
     }
 
     private void destroyResources() {
-
+/*TODO
         for (Renderable renderable: renderables)
             renderable.destroy();
 
         renderables = null;
-        index = 0;
+        index = 0;*/
     }
 
     private float timeStep() {

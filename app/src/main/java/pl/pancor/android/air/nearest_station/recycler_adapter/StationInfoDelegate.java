@@ -49,8 +49,7 @@ public class StationInfoDelegate extends AdapterDelegate<Station> {
 
         StationInfoHolder h = (StationInfoHolder) holder;
 
-        //TODO
-        String distance = 1000 + " km";
+        String distance = station.getDistance() + " km";
 
         h.mStationName.setText(station.getName());
         h.mLastCheck.setText(OtherUtils.getConvertedDate(station.getUpdateTime()));

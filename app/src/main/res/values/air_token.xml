@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Get the API key at http://aqicn.org/data-platform/token/#/ -->
+    <string name="air_token"
+        templateMergeStrategy="preserve"
+        translatable="false">0JUReK8NbMfjkDIDc11r5z7mHyUUOy</string>
+</resources>

@@ -52,7 +52,6 @@ public class NearestStationFragment extends Fragment implements NearestStation.V
         return new NearestStationFragment();
     }
 
-    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -74,7 +73,7 @@ public class NearestStationFragment extends Fragment implements NearestStation.V
         mLayoutManager = new GridLayoutManager(getContext(), columns);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mPresenter.findNearestStation(getString(R.string.air_token));//TODO make it call only when bundle is null
+        mPresenter.findNearestStation(getString(R.string.air_token));
     }
 
     @Override
@@ -103,14 +102,10 @@ public class NearestStationFragment extends Fragment implements NearestStation.V
     }
 
     @Override
-    public void setStation(Station station, Double lat, Double lng) {
+    public void setStation(Station station) {
 
-        Toast.makeText(getContext(), "Station: " + station.getLatitude() + " " + station.getLongitude() +
-                                     "User: " + lat + " " + lng, Toast.LENGTH_LONG).show();
         mStation = station;
         mRecyclerView.setAdapter(new StationRecyclerAdapter(getActivity(), mStation));
-
-        ((NearestStationActivity)getActivity()).onAirQualitySet(station.getAqIndex());
     }
 
     @Override
@@ -130,16 +125,13 @@ public class NearestStationFragment extends Fragment implements NearestStation.V
 
         showDialog(R.string.dialog_could_not_get_localization);
     }
+
     private void showErrorSnackBar(int text){
 
         Snackbar.make(getView(), text, Snackbar.LENGTH_INDEFINITE)
-                .setAction(R.string.retry, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-                        mPresenter.findNearestStation(getString(R.string.air_token));
-                    }
-                }).show();
+                .setAction(R.string.retry, view ->
+                        mPresenter.findNearestStation(getString(R.string.air_token)))
+                .show();
     }
 
     private void showDialog(int text){
@@ -147,21 +139,12 @@ public class NearestStationFragment extends Fragment implements NearestStation.V
         new AlertDialog.Builder(getContext())
                 .setMessage(text)
                 .setCancelable(false)
-                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
+                .setPositiveButton(R.string.yes, (dialogInterface, i) ->
                         startActivityForResult(new Intent(getActivity(),
-                                FindLocationActivity.class), REQUEST_LOCATION);
-                    }
-                })
-                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                        dialogInterface.dismiss();
-                    }
-                }).show();
+                            FindLocationActivity.class), REQUEST_LOCATION))
+                .setNegativeButton(R.string.no, (dialogInterface, i) ->
+                        dialogInterface.dismiss())
+                .show();
     }
 
     private void handleOnActivityResult(int requestCode, int resultCode, Intent data){

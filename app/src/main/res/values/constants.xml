@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
-    <string name="CO">CO</string>
-    <string name="NO2">NO<small><sub>2</sub></small></string>
-    <string name="O3">O<small><sub>3</sub></small></string>
-    <string name="PM10">PM<small><sub>10</sub></small></string>
-    <string name="PM2.5">PM<small><sub>2.5</sub></small></string>
-    <string name="SO2">SO<small><sub>2</sub></small></string>
+
     <string name="µg_m3"> µg/m<small><sup>3</sup></small></string>
     
 </resources>

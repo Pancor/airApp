@@ -10,7 +10,7 @@ public interface NearestStation {
 
         void setLoadingIndicator(boolean active);
 
-        void setStation(Station station, Double lat, Double lng);
+        void setStation(Station station);
 
         void onConnectionError();
 
